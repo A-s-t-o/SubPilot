@@ -1,4 +1,4 @@
-package com.geekneuron.subpilot.subtitle
+package com.subpilot.data
 
 import okio.BufferedSource
 import okio.FileSystem
