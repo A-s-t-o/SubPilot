@@ -17,6 +17,8 @@ jobs:
         java-version: '17'
     - name: Make gradlew executable
       run: chmod +x gradlew
+    - name: Fix gradlew line endings
+      run: sed -i 's/\r$//' gradlew
     - name: Build debug APK
       run: ./gradlew assembleDebug
     - name: Upload debug APK
