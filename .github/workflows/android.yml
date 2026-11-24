@@ -19,6 +19,7 @@ jobs:
       run: chmod +x gradlew
     - name: Fix gradlew line endings
       run: sed -i 's/\r$//' gradlew
+    - name: Fix wrapper permissions
       run: chmod +x ./gradle/wrapper/gradle-wrapper.jar
     - name: Build debug APK
       run: ./gradlew assembleDebug
