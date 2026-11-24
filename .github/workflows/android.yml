@@ -16,8 +16,9 @@ jobs:
         distribution: 'zulu'
         java-version: '17'
     - name: Make gradlew executable
-      run: chmod +x gradlew
-      run: chmod +x ./gradlew
+      run: |
+        chmod +x ./gradlew
+        chmod +x ./gradle/wrapper/gradle-wrapper.jar
     - name: Fix gradlew line endings
       run: sed -i 's/\r$//' gradlew
     - name: Fix wrapper permissions
