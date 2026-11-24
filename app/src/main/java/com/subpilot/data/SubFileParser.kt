@@ -69,7 +69,7 @@ object SubFileParser {
         val result = mutableListOf<ASSEntry>()
         var dialogueFound = false
         fs.source(path).buffer().use { source ->
-            source.readUtf8LineSequence().forEach { line ->
+            readUtf8().lineSequence().forEach { line ->
                 if (line.startsWith("[Events]")) {
                     dialogueFound = true
                 } else if (dialogueFound && line.startsWith("Dialogue:")) {
