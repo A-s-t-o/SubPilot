@@ -15,8 +15,6 @@ jobs:
       with:
         distribution: 'zulu'
         java-version: '17'
-    - name: Regenerate Gradle Wrapper
-      run: ./gradlew wrapper
     - name: Make gradlew executable
       run: chmod +x ./gradlew
     - name: Build debug APK
