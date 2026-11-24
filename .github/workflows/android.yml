@@ -17,6 +17,7 @@ jobs:
         java-version: '17'
     - name: Make gradlew executable
       run: chmod +x gradlew
+      run: chmod +x ./gradlew
     - name: Fix gradlew line endings
       run: sed -i 's/\r$//' gradlew
     - name: Fix wrapper permissions
