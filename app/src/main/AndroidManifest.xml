@@ -7,7 +7,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SubPilot">
 
-        <activity android:name="com.subpilot.MainActivity"
+        <activity android:name="com.geekneuron.subpilot.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
