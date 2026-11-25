@@ -1,4 +1,4 @@
-package com.subpilot.ui.theme
+package com.geekneuron.subpilot.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
