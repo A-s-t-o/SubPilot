@@ -1,12 +1,15 @@
 package com.subpilot.data
 
-import okio.BufferedSource
 import okio.FileSystem
 import okio.Path
 import okio.buffer
 import okio.use
 
-sealed class SubtitleEntry(open val startMs: Long, open val endMs: Long, open val text: String)
+sealed class SubtitleEntry(
+    open val startMs: Long,
+    open val endMs: Long,
+    open val text: String
+)
 
 data class SRTEntry(
     override val startMs: Long,
@@ -22,6 +25,7 @@ data class ASSEntry(
 ) : SubtitleEntry(startMs, endMs, text)
 
 object SubFileParser {
+
     fun parse(fileSystem: FileSystem, path: Path): List<SubtitleEntry> {
         val extension = path.name.substringAfterLast(".").lowercase()
         return when (extension) {
@@ -34,20 +38,20 @@ object SubFileParser {
     private fun parseSRT(fs: FileSystem, path: Path): List<SRTEntry> {
         val result = mutableListOf<SRTEntry>()
         fs.source(path).buffer().use { source ->
-            val lines = source.readUtf8().split("\r?\n")
+            val lines = source.readUtf8().split(Regex("\\r?\\n"))
             var i = 0
             while (i < lines.size) {
-                val index = lines[i].trim()
                 i++
                 if (i >= lines.size) break
                 val timeLine = lines[i++].trim()
-                val timeParts = timeLine.split(" --> ")
+                val timeParts = timeLine.split("-->")
                 if (timeParts.size != 2) continue
-                val startMs = parseSrtTime(timeParts[0])
-                val endMs = parseSrtTime(timeParts[1])
+                val startMs = parseSrtTime(timeParts[0].trim())
+                val endMs = parseSrtTime(timeParts[1].trim())
                 val textLines = mutableListOf<String>()
                 while (i < lines.size && lines[i].isNotBlank()) {
-                    textLines.add(lines[i++])
+                    textLines.add(lines[i])
+                    i++
                 }
                 result.add(SRTEntry(startMs, endMs, textLines.joinToString("\n")))
                 while (i < lines.size && lines[i].isBlank()) i++
@@ -58,18 +62,19 @@ object SubFileParser {
 
     private fun parseSrtTime(timeStr: String): Long {
         val parts = timeStr.split(":", ",")
-        val h = parts[0].toInt()
-        val m = parts[1].toInt()
-        val s = parts[2].toInt()
-        val ms = parts[3].toInt()
-        return ((h * 3600 + m * 60 + s) * 1000L + ms)
+        if (parts.size < 4) return 0L
+        val h = parts[0].trim().toLongOrNull() ?: return 0L
+        val m = parts[1].trim().toLongOrNull() ?: return 0L
+        val s = parts[2].trim().toLongOrNull() ?: return 0L
+        val ms = parts[3].trim().toLongOrNull() ?: return 0L
+        return (h * 3600 + m * 60 + s) * 1000L + ms
     }
 
     private fun parseASS(fs: FileSystem, path: Path): List<ASSEntry> {
         val result = mutableListOf<ASSEntry>()
         var dialogueFound = false
         fs.source(path).buffer().use { source ->
-            readUtf8().lineSequence().forEach { line ->
+            source.readUtf8().lineSequence().forEach { line ->
                 if (line.startsWith("[Events]")) {
                     dialogueFound = true
                 } else if (dialogueFound && line.startsWith("Dialogue:")) {
@@ -87,11 +92,12 @@ object SubFileParser {
     }
 
     private fun parseAssTime(timeStr: String): Long {
-        val parts = timeStr.split(":", ".")
-        val h = parts[0].toInt()
-        val m = parts[1].toInt()
-        val s = parts[2].toInt()
-        val cs = parts[3].toInt()
-        return ((h * 3600 + m * 60 + s) * 1000L + cs * 10)
+        val parts = timeStr.trim().split(":", ".")
+        if (parts.size < 4) return 0L
+        val h = parts[0].trim().toLongOrNull() ?: return 0L
+        val m = parts[1].trim().toLongOrNull() ?: return 0L
+        val s = parts[2].trim().toLongOrNull() ?: return 0L
+        val cs = parts[3].trim().toLongOrNull() ?: return 0L
+        return (h * 3600 + m * 60 + s) * 1000L + cs * 10
     }
 }
